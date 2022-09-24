@@ -21,14 +21,12 @@ class PersistedChannelCollection(Sequence):
 
         if isinstance(item, six.string_types):
             items = unflatten_channel_string(item)
-            return all([i in channel_names for i in items])
+            return all(i in channel_names for i in items)
         elif isinstance(item, PersistedChannel):
             return item._name in channel_names
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return True
-        return False
+        return isinstance(other, self.__class__)
 
     def __getitem__(self, index):
         """

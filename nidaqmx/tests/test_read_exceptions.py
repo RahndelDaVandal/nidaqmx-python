@@ -26,7 +26,7 @@ class TestReadExceptions(object):
 
     def test_timeout(self, real_x_series_device):
         # USB streaming is very tricky.
-        if not (real_x_series_device.bus_type == BusType.PCIE or real_x_series_device.bus_type == BusType.PXIE):
+        if real_x_series_device.bus_type not in [BusType.PCIE, BusType.PXIE]:
             pytest.skip("Requires a plugin device.")
 
         samples_to_read = 75
@@ -78,7 +78,7 @@ class TestReadExceptions(object):
 
     def test_timeout_raw(self, real_x_series_device):
         # USB streaming is very tricky.
-        if not (real_x_series_device.bus_type == BusType.PCIE or real_x_series_device.bus_type == BusType.PXIE):
+        if real_x_series_device.bus_type not in [BusType.PCIE, BusType.PXIE]:
             pytest.skip("Requires a plugin device.")
 
         samples_to_read = 75
@@ -133,7 +133,7 @@ class TestReadExceptions(object):
 
     def test_timeout_stream(self, real_x_series_device):
         # USB streaming is very tricky.
-        if not (real_x_series_device.bus_type == BusType.PCIE or real_x_series_device.bus_type == BusType.PXIE):
+        if real_x_series_device.bus_type not in [BusType.PCIE, BusType.PXIE]:
             pytest.skip("Requires a plugin device.")
 
         samples_to_read = 75
@@ -181,7 +181,7 @@ class TestReadExceptions(object):
                 data, number_of_samples_per_channel=samples_to_read, timeout=2.0)
             assert num_values_read == samples_to_read
             # All the data should have been overwritten.
-            assert not any(element == sentinel_value for element in data)
+            assert all(element != sentinel_value for element in data)
 
             # Now read more data than is available.
             data = numpy.full(samples_to_read, sentinel_value, dtype=numpy.float64)
@@ -194,6 +194,10 @@ class TestReadExceptions(object):
             number_of_samples_expected = (clocks_to_give - samples_to_read)
             assert timeout_exception.value.samps_per_chan_read == number_of_samples_expected
             # The data that was succesfully read should have been overwritten.
-            assert not any(element == sentinel_value for element in data[:number_of_samples_expected])
+            assert all(
+                element != sentinel_value
+                for element in data[:number_of_samples_expected]
+            )
+
             # The data that wasn't read should have been unmodified.
             assert all(element == sentinel_value for element in data[number_of_samples_expected:])

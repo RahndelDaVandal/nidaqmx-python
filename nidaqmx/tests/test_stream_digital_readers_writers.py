@@ -82,7 +82,7 @@ class TestDigitalSingleChannelReaderWriter(TestDAQmxIOBase):
 
     @pytest.mark.parametrize('seed', [generate_random_seed()])
     def test_one_sample_port_byte(self, real_x_series_device, seed):
-        if not any([d.do_port_width <= 8 for d in real_x_series_device.do_ports]):
+        if all(d.do_port_width > 8 for d in real_x_series_device.do_ports):
             pytest.skip("Requires digital port with at most 8 lines.")
 
         # Reset the pseudorandom number generator with seed.
@@ -96,8 +96,7 @@ class TestDigitalSingleChannelReaderWriter(TestDAQmxIOBase):
                 do_port.name, line_grouping=LineGrouping.CHAN_FOR_ALL_LINES)
 
             # Generate random values to test.
-            values_to_test = [int(random.getrandbits(do_port.do_port_width))
-                              for _ in range(10)]
+            values_to_test = [random.getrandbits(do_port.do_port_width) for _ in range(10)]
 
             writer = DigitalSingleChannelWriter(task.out_stream)
             reader = DigitalSingleChannelReader(task.in_stream)
@@ -112,7 +111,7 @@ class TestDigitalSingleChannelReaderWriter(TestDAQmxIOBase):
 
     @pytest.mark.parametrize('seed', [generate_random_seed()])
     def test_one_sample_port_uint16(self, real_x_series_device, seed):
-        if not any([d.do_port_width <= 16 for d in real_x_series_device.do_ports]):
+        if all(d.do_port_width > 16 for d in real_x_series_device.do_ports):
             pytest.skip("Requires digital port with at most 16 lines.")
 
         # Reset the pseudorandom number generator with seed.
@@ -126,8 +125,7 @@ class TestDigitalSingleChannelReaderWriter(TestDAQmxIOBase):
                 do_port.name, line_grouping=LineGrouping.CHAN_FOR_ALL_LINES)
 
             # Generate random values to test.
-            values_to_test = [int(random.getrandbits(do_port.do_port_width))
-                              for _ in range(10)]
+            values_to_test = [random.getrandbits(do_port.do_port_width) for _ in range(10)]
 
             writer = DigitalSingleChannelWriter(task.out_stream)
             reader = DigitalSingleChannelReader(task.in_stream)
@@ -142,7 +140,7 @@ class TestDigitalSingleChannelReaderWriter(TestDAQmxIOBase):
 
     @pytest.mark.parametrize('seed', [generate_random_seed()])
     def test_one_sample_port_uint32(self, real_x_series_device, seed):
-        if not any([d.do_port_width <= 32 for d in real_x_series_device.do_ports]):
+        if all(d.do_port_width > 32 for d in real_x_series_device.do_ports):
             pytest.skip("Requires digital port with at most 32 lines.")
 
         # Reset the pseudorandom number generator with seed.
@@ -156,8 +154,7 @@ class TestDigitalSingleChannelReaderWriter(TestDAQmxIOBase):
                 do_port.name, line_grouping=LineGrouping.CHAN_FOR_ALL_LINES)
 
             # Generate random values to test.
-            values_to_test = [int(random.getrandbits(do_port.do_port_width))
-                              for _ in range(10)]
+            values_to_test = [random.getrandbits(do_port.do_port_width) for _ in range(10)]
 
             writer = DigitalSingleChannelWriter(task.out_stream)
             reader = DigitalSingleChannelReader(task.in_stream)
@@ -172,7 +169,7 @@ class TestDigitalSingleChannelReaderWriter(TestDAQmxIOBase):
 
     @pytest.mark.parametrize('seed', [generate_random_seed()])
     def test_many_sample_port_byte(self, real_x_series_device, seed):
-        if not any([d.do_port_width <= 8 for d in real_x_series_device.do_ports]):
+        if all(d.do_port_width > 8 for d in real_x_series_device.do_ports):
             pytest.skip("Requires digital port with at most 8 lines.")
 
         # Reset the pseudorandom number generator with seed.
@@ -188,8 +185,13 @@ class TestDigitalSingleChannelReaderWriter(TestDAQmxIOBase):
 
             # Generate random values to test.
             values_to_test = numpy.array(
-                [int(random.getrandbits(do_port.do_port_width))
-                 for _ in range(number_of_samples)], dtype=numpy.uint8)
+                [
+                    random.getrandbits(do_port.do_port_width)
+                    for _ in range(number_of_samples)
+                ],
+                dtype=numpy.uint8,
+            )
+
 
             writer = DigitalSingleChannelWriter(task.out_stream)
             reader = DigitalSingleChannelReader(task.in_stream)
@@ -213,7 +215,7 @@ class TestDigitalSingleChannelReaderWriter(TestDAQmxIOBase):
 
     @pytest.mark.parametrize('seed', [generate_random_seed()])
     def test_many_sample_port_uint16(self, real_x_series_device, seed):        
-        if not any([d.do_port_width <= 16 for d in real_x_series_device.do_ports]):
+        if all(d.do_port_width > 16 for d in real_x_series_device.do_ports):
             pytest.skip("Requires digital port with at most 16 lines.")
 
         # Reset the pseudorandom number generator with seed.
@@ -229,8 +231,13 @@ class TestDigitalSingleChannelReaderWriter(TestDAQmxIOBase):
 
             # Generate random values to test.
             values_to_test = numpy.array(
-                [int(random.getrandbits(do_port.do_port_width))
-                 for _ in range(number_of_samples)], dtype=numpy.uint16)
+                [
+                    random.getrandbits(do_port.do_port_width)
+                    for _ in range(number_of_samples)
+                ],
+                dtype=numpy.uint16,
+            )
+
 
             writer = DigitalSingleChannelWriter(task.out_stream)
             reader = DigitalSingleChannelReader(task.in_stream)
@@ -254,7 +261,7 @@ class TestDigitalSingleChannelReaderWriter(TestDAQmxIOBase):
 
     @pytest.mark.parametrize('seed', [generate_random_seed()])
     def test_many_sample_port_uint32(self, real_x_series_device, seed):
-        if not any([d.do_port_width <= 32 for d in real_x_series_device.do_ports]):
+        if all(d.do_port_width > 32 for d in real_x_series_device.do_ports):
             pytest.skip("Requires digital port with at most 32 lines.")
 
         # Reset the pseudorandom number generator with seed.
@@ -270,8 +277,13 @@ class TestDigitalSingleChannelReaderWriter(TestDAQmxIOBase):
 
             # Generate random values to test.
             values_to_test = numpy.array(
-                [int(random.getrandbits(do_port.do_port_width))
-                 for _ in range(number_of_samples)], dtype=numpy.uint32)
+                [
+                    random.getrandbits(do_port.do_port_width)
+                    for _ in range(number_of_samples)
+                ],
+                dtype=numpy.uint32,
+            )
+
 
             writer = DigitalSingleChannelWriter(task.out_stream)
             reader = DigitalSingleChannelReader(task.in_stream)
@@ -390,8 +402,10 @@ class TestDigitalMultiChannelReaderWriter(TestDAQmxIOBase):
 
             # Generate random values to test.
             values_to_test = numpy.array(
-                [int(random.getrandbits(d.do_port_width)) for d in do_ports],
-                dtype=numpy.uint8)
+                [random.getrandbits(d.do_port_width) for d in do_ports],
+                dtype=numpy.uint8,
+            )
+
 
             writer = DigitalMultiChannelWriter(task.out_stream)
             reader = DigitalMultiChannelReader(task.in_stream)
@@ -425,8 +439,10 @@ class TestDigitalMultiChannelReaderWriter(TestDAQmxIOBase):
 
             # Generate random values to test.
             values_to_test = numpy.array(
-                [int(random.getrandbits(d.do_port_width)) for d in do_ports],
-                dtype=numpy.uint16)
+                [random.getrandbits(d.do_port_width) for d in do_ports],
+                dtype=numpy.uint16,
+            )
+
 
             writer = DigitalMultiChannelWriter(task.out_stream)
             reader = DigitalMultiChannelReader(task.in_stream)
@@ -460,8 +476,10 @@ class TestDigitalMultiChannelReaderWriter(TestDAQmxIOBase):
 
             # Generate random values to test.
             values_to_test = numpy.array(
-                [int(random.getrandbits(d.do_port_width)) for d in do_ports],
-                dtype=numpy.uint32)
+                [random.getrandbits(d.do_port_width) for d in do_ports],
+                dtype=numpy.uint32,
+            )
+
 
             writer = DigitalMultiChannelWriter(task.out_stream)
             reader = DigitalMultiChannelReader(task.in_stream)
@@ -497,9 +515,16 @@ class TestDigitalMultiChannelReaderWriter(TestDAQmxIOBase):
 
             # Generate random values to test.
             values_to_test = numpy.array(
-                [[int(random.getrandbits(do_port.do_port_width))
-                  for _ in range(number_of_samples)] for do_port in do_ports],
-                dtype=numpy.uint8)
+                [
+                    [
+                        random.getrandbits(do_port.do_port_width)
+                        for _ in range(number_of_samples)
+                    ]
+                    for do_port in do_ports
+                ],
+                dtype=numpy.uint8,
+            )
+
 
             writer = DigitalMultiChannelWriter(task.out_stream)
             reader = DigitalMultiChannelReader(task.in_stream)
@@ -546,9 +571,16 @@ class TestDigitalMultiChannelReaderWriter(TestDAQmxIOBase):
 
             # Generate random values to test.
             values_to_test = numpy.array(
-                [[int(random.getrandbits(do_port.do_port_width))
-                  for _ in range(number_of_samples)] for do_port in do_ports],
-                dtype=numpy.uint16)
+                [
+                    [
+                        random.getrandbits(do_port.do_port_width)
+                        for _ in range(number_of_samples)
+                    ]
+                    for do_port in do_ports
+                ],
+                dtype=numpy.uint16,
+            )
+
 
             writer = DigitalMultiChannelWriter(task.out_stream)
             reader = DigitalMultiChannelReader(task.in_stream)
@@ -595,9 +627,16 @@ class TestDigitalMultiChannelReaderWriter(TestDAQmxIOBase):
 
             # Generate random values to test.
             values_to_test = numpy.array(
-                [[int(random.getrandbits(do_port.do_port_width))
-                  for _ in range(number_of_samples)] for do_port in do_ports],
-                dtype=numpy.uint32)
+                [
+                    [
+                        random.getrandbits(do_port.do_port_width)
+                        for _ in range(number_of_samples)
+                    ]
+                    for do_port in do_ports
+                ],
+                dtype=numpy.uint32,
+            )
+
 
             writer = DigitalMultiChannelWriter(task.out_stream)
             reader = DigitalMultiChannelReader(task.in_stream)

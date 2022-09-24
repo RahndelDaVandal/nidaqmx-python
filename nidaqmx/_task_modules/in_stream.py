@@ -2174,16 +2174,17 @@ class InStream(object):
         check_for_error(error_code)
 
     def _calculate_num_samps_per_chan(self, num_samps_per_chan):
-        if num_samps_per_chan == -1:
-            acq_type = self._task.timing.samp_quant_samp_mode
-
-            if (acq_type == AcquisitionType.FINITE and
-                    not self.read_all_avail_samp):
-                return self._task.timing.samp_quant_samp_per_chan
-            else:
-                return self.avail_samp_per_chan
-        else:
+        if num_samps_per_chan != -1:
             return num_samps_per_chan
+        acq_type = self._task.timing.samp_quant_samp_mode
+
+        return (
+            self._task.timing.samp_quant_samp_per_chan
+            if (
+                acq_type == AcquisitionType.FINITE and not self.read_all_avail_samp
+            )
+            else self.avail_samp_per_chan
+        )
 
     def configure_logging(
             self, file_path, logging_mode=LoggingMode.LOG_AND_READ,
@@ -2286,22 +2287,12 @@ class InStream(object):
         samp_size_in_bits = channels_to_read.ai_raw_samp_size
         has_negative_range = channels_to_read.ai_rng_low < 0
 
-        if samp_size_in_bits == 32:
-            if has_negative_range:
-                dtype = numpy.int32
-            else:
-                dtype = numpy.uint32
-        elif samp_size_in_bits == 16:
-            if has_negative_range:
-                dtype = numpy.int16
-            else:
-                dtype = numpy.uint16
+        if samp_size_in_bits == 16:
+            dtype = numpy.int16 if has_negative_range else numpy.uint16
+        elif samp_size_in_bits == 32:
+            dtype = numpy.int32 if has_negative_range else numpy.uint32
         else:
-            if has_negative_range:
-                dtype = numpy.int8
-            else:
-                dtype = numpy.uint8
-
+            dtype = numpy.int8 if has_negative_range else numpy.uint8
         num_samps_per_chan = self._calculate_num_samps_per_chan(
             number_of_samples_per_channel)
 

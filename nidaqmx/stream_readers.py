@@ -74,19 +74,19 @@ class ChannelReaderBase(object):
         if not self._verify_array_shape:
             return
 
-        channels_to_read = self._in_stream.channels_to_read
-        number_of_channels = len(channels_to_read.channel_names)
-
         array_shape = None
         if is_many_chan:
-            if is_many_samp:
-                array_shape = (number_of_channels,
-                               number_of_samples_per_channel)
-            else:
-                array_shape = (number_of_channels,)
-        else:
-            if is_many_samp:
-                array_shape = (number_of_samples_per_channel,)
+            channels_to_read = self._in_stream.channels_to_read
+            number_of_channels = len(channels_to_read.channel_names)
+
+            array_shape = (
+                (number_of_channels, number_of_samples_per_channel)
+                if is_many_samp
+                else (number_of_channels,)
+            )
+
+        elif is_many_samp:
+            array_shape = (number_of_samples_per_channel,)
 
         if array_shape is not None and data.shape != array_shape:
             raise DaqError(
@@ -118,19 +118,20 @@ class ChannelReaderBase(object):
         if not self._verify_array_shape:
             return
 
-        channels_to_read = self._in_stream.channels_to_read
-        number_of_channels = len(channels_to_read.channel_names)
         number_of_lines = self._in_stream.di_num_booleans_per_chan
 
         array_shape = None
         if is_many_chan:
-            if is_many_line:
-                array_shape = (number_of_channels, number_of_lines)
-            else:
-                array_shape = (number_of_channels,)
-        else:
-            if is_many_line:
-                array_shape = (number_of_lines,)
+            channels_to_read = self._in_stream.channels_to_read
+            number_of_channels = len(channels_to_read.channel_names)
+            array_shape = (
+                (number_of_channels, number_of_lines)
+                if is_many_line
+                else (number_of_channels,)
+            )
+
+        elif is_many_line:
+            array_shape = (number_of_lines,)
 
         if array_shape is not None and data.shape != array_shape:
             raise DaqError(

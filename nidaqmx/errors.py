@@ -211,9 +211,10 @@ def check_for_error(error_code, samps_per_chan_written=None, samps_per_chan_read
 
 
 def is_string_buffer_too_small(error_code):
-    return (
-        error_code == DAQmxErrors.BUFFER_TOO_SMALL_FOR_STRING or
-        error_code == DAQmxWarnings.CAPI_STRING_TRUNCATED_TO_FIT_BUFFER)
+    return error_code in [
+        DAQmxErrors.BUFFER_TOO_SMALL_FOR_STRING,
+        DAQmxWarnings.CAPI_STRING_TRUNCATED_TO_FIT_BUFFER,
+    ]
 
 
 def is_array_buffer_too_small(error_code):

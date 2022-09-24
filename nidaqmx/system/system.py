@@ -335,13 +335,12 @@ class System(object):
             error_code = cfunc(*args)
         check_for_error(error_code)
 
-        power_up_states = []
-        for d, p in zip(device.do_lines, states):
-            power_up_states.append(
-                DOPowerUpState(physical_channel=d.name,
-                               power_up_state=PowerUpStates(p.value)))
-
-        return power_up_states
+        return [
+            DOPowerUpState(
+                physical_channel=d.name, power_up_state=PowerUpStates(p.value)
+            )
+            for d, p in zip(device.do_lines, states)
+        ]
 
     def set_digital_pull_up_pull_down_states(
             self, device_name, power_up_states):
@@ -427,14 +426,12 @@ class System(object):
             error_code = cfunc(*args)
         check_for_error(error_code)
 
-        power_up_states = []
-        for d, p in zip(device.do_lines, states):
-            power_up_states.append(
-                DOResistorPowerUpState(
-                    physical_channel=d.name,
-                    power_up_state=ResistorState(p.value)))
-
-        return power_up_states
+        return [
+            DOResistorPowerUpState(
+                physical_channel=d.name, power_up_state=ResistorState(p.value)
+            )
+            for d, p in zip(device.do_lines, states)
+        ]
 
     def set_analog_power_up_states(self, device_name, power_up_states):
         """
@@ -574,15 +571,14 @@ class System(object):
             error_code = cfunc(*args)
         check_for_error(error_code)
 
-        power_up_states = []
-        for a, p, c in zip(device.ao_physical_chans, states, channel_types):
-            power_up_states.append(
-                AOPowerUpState(
-                    physical_channel=a.name,
-                    power_up_state=p.value,
-                    channel_type=AOPowerUpOutputBehavior(c.value)))
-
-        return power_up_states
+        return [
+            AOPowerUpState(
+                physical_channel=a.name,
+                power_up_state=p.value,
+                channel_type=AOPowerUpOutputBehavior(c.value),
+            )
+            for a, p, c in zip(device.ao_physical_chans, states, channel_types)
+        ]
 
     def get_analog_power_up_states_with_output_type(self, physical_channels):
         """
@@ -628,15 +624,14 @@ class System(object):
 
         check_for_error(error_code)
 
-        power_up_states = []
-        for p, s, c in zip(physical_channels, states, channel_types):
-            power_up_states.append(
-                AOPowerUpState(
-                    physical_channel=p,
-                    power_up_state=float(s),
-                    channel_type=AOPowerUpOutputBehavior(c.value)))
-
-        return power_up_states
+        return [
+            AOPowerUpState(
+                physical_channel=p,
+                power_up_state=float(s),
+                channel_type=AOPowerUpOutputBehavior(c.value),
+            )
+            for p, s, c in zip(physical_channels, states, channel_types)
+        ]
 
     def set_digital_logic_family_power_up_state(
             self, device_name, logic_family):
@@ -765,13 +760,10 @@ class System(object):
         output_ports = ports[::2]
         input_ports = ports[1::2]
 
-        connections = []
-        for output_port, input_port in zip(output_ports, input_ports):
-            connections.append(
-                CDAQSyncConnection(output_port=output_port,
-                                   input_port=input_port))
-
-        return connections
+        return [
+            CDAQSyncConnection(output_port=output_port, input_port=input_port)
+            for output_port, input_port in zip(output_ports, input_ports)
+        ]
 
     def are_configured_cdaq_sync_ports_disconnected(
             self, chassis_devices_ports="", timeout=WAIT_INFINITELY):
@@ -843,13 +835,10 @@ class System(object):
         output_ports = ports[::2]
         input_ports = ports[1::2]
 
-        connections = []
-        for output_port, input_port in zip(output_ports, input_ports):
-            connections.append(
-                CDAQSyncConnection(output_port=output_port,
-                                   input_port=input_port))
-
-        return connections
+        return [
+            CDAQSyncConnection(output_port=output_port, input_port=input_port)
+            for output_port, input_port in zip(output_ports, input_ports)
+        ]
 
     def add_cdaq_sync_connection(self, ports_to_connect):
         """

@@ -87,11 +87,21 @@ class TestPowerSingleChannelReader(TestDAQmxIOBase):
                 number_of_samples_per_channel=number_of_samples_per_channel)
 
             if output_enable:
-                assert all([sample == pytest.approx(voltage_setpoint, abs=POWER_ABS_EPSILON) for sample in voltage_data])
-                assert all([sample == pytest.approx(current_setpoint, abs=POWER_ABS_EPSILON) for sample in current_data])
+                assert all(
+                    sample
+                    == pytest.approx(voltage_setpoint, abs=POWER_ABS_EPSILON)
+                    for sample in voltage_data
+                )
+
+                assert all(
+                    sample
+                    == pytest.approx(current_setpoint, abs=POWER_ABS_EPSILON)
+                    for sample in current_data
+                )
+
             else:
-                assert all([math.isnan(sample) for sample in voltage_data])
-                assert all([math.isnan(sample) for sample in current_data])
+                assert all(math.isnan(sample) for sample in voltage_data)
+                assert all(math.isnan(sample) for sample in current_data)
 
 
 class TestPowerMultiChannelReader(TestDAQmxIOBase):
@@ -180,11 +190,21 @@ class TestPowerMultiChannelReader(TestDAQmxIOBase):
                 voltage_channel_data = voltage_data[chan_index]
                 current_channel_data = current_data[chan_index]
                 if output_enable:
-                    assert all([sample == pytest.approx(voltage_setpoint, abs=POWER_ABS_EPSILON) for sample in voltage_channel_data])
-                    assert all([sample == pytest.approx(current_setpoint, abs=POWER_ABS_EPSILON) for sample in current_channel_data])
+                    assert all(
+                        sample
+                        == pytest.approx(voltage_setpoint, abs=POWER_ABS_EPSILON)
+                        for sample in voltage_channel_data
+                    )
+
+                    assert all(
+                        sample
+                        == pytest.approx(current_setpoint, abs=POWER_ABS_EPSILON)
+                        for sample in current_channel_data
+                    )
+
                 else:
-                    assert all([math.isnan(sample) for sample in voltage_channel_data])
-                    assert all([math.isnan(sample) for sample in current_channel_data])
+                    assert all(math.isnan(sample) for sample in voltage_channel_data)
+                    assert all(math.isnan(sample) for sample in current_channel_data)
 
 
 class TestPowerBinaryReader(TestDAQmxIOBase):
@@ -231,12 +251,12 @@ class TestPowerBinaryReader(TestDAQmxIOBase):
             channel_current_data = current_data[0]
             if output_enable:
                 # Scaling is complicated, just ensure everything was overwritten.
-                assert not any([sample == -32768 for sample in channel_voltage_data])
-                assert not any([sample == -32768 for sample in channel_current_data])
+                assert all(sample != -32768 for sample in channel_voltage_data)
+                assert all(sample != -32768 for sample in channel_current_data)
             else:
                 # Simulated data is 0 when output is disabled for binary reads.
-                assert all([sample == 0 for sample in channel_voltage_data])
-                assert all([sample == 0 for sample in channel_current_data])
+                assert all(sample == 0 for sample in channel_voltage_data)
+                assert all(sample == 0 for sample in channel_current_data)
 
     @pytest.mark.parametrize(
         'seed,output_enables',
@@ -278,9 +298,9 @@ class TestPowerBinaryReader(TestDAQmxIOBase):
                 current_channel_data = current_data[chan_index]
                 if output_enable:
                     # Scaling is complicated, just ensure everything was overwritten.
-                    assert not any([sample == -32768 for sample in voltage_channel_data])
-                    assert not any([sample == -32768 for sample in current_channel_data])
+                    assert all(sample != -32768 for sample in voltage_channel_data)
+                    assert all(sample != -32768 for sample in current_channel_data)
                 else:
                     # Simulated data is 0 when output is disabled for binary reads.
-                    assert all([sample == 0 for sample in voltage_channel_data])
-                    assert all([sample == 0 for sample in current_channel_data])
+                    assert all(sample == 0 for sample in voltage_channel_data)
+                    assert all(sample == 0 for sample in current_channel_data)

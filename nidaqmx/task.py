@@ -610,11 +610,12 @@ class Task(object):
 
         # Determine the array shape and size to create
         if number_of_channels > 1:
-            if not num_samples_not_set:
-                array_shape = (number_of_channels,
-                               number_of_samples_per_channel)
-            else:
-                array_shape = number_of_channels
+            array_shape = (
+                number_of_channels
+                if num_samples_not_set
+                else (number_of_channels, number_of_samples_per_channel)
+            )
+
         else:
             array_shape = number_of_samples_per_channel
 
@@ -630,41 +631,42 @@ class Task(object):
                     number_of_samples_per_channel, timeout)
 
                 if number_of_channels > 1:
+                    # n channel, 1 sample
+                    data = []
                     if number_of_samples_per_channel == 1:
-                        # n channel, 1 sample
-                        data = []
                         for v, i in zip(voltages, currents):
                             data.append(PowerMeasurement(voltage=v, current=i))
-                        return data
                     else:
-                        # n channel, n samples
-                        data = []
                         for channel_index in range(number_of_channels):
-                            channel_data = []
                             channel_voltages = voltages[channel_index]
                             channel_currents = currents[channel_index]
-                            for v, i in zip(channel_voltages, channel_currents):
-                                channel_data.append(PowerMeasurement(voltage=v, current=i))
+                            channel_data = [
+                                PowerMeasurement(voltage=v, current=i)
+                                for v, i in zip(channel_voltages, channel_currents)
+                            ]
+
                             data.append(channel_data)
-                        return data
+                    return data
                 else:
                     if number_of_samples_per_channel == 1:
                         # 1 channel, 1 sample
                         return PowerMeasurement(voltage=voltages[0], current=currents[0])
-                    else:
                         # 1 channel, n samples
-                        data = []
-                        for v, i in zip(voltages, currents):
-                            data.append(PowerMeasurement(voltage=v, current=i))
-                        return data[:samples_read]
+                    data = [
+                        PowerMeasurement(voltage=v, current=i)
+                        for v, i in zip(voltages, currents)
+                    ]
+
+                    return data[:samples_read]
             else:
                 data = numpy.zeros(array_shape, dtype=numpy.float64)
                 samples_read = _read_analog_f_64(
                     self._handle, data, number_of_samples_per_channel, timeout)
 
-        # Digital Input or Digital Output
-        elif (read_chan_type == ChannelType.DIGITAL_INPUT or
-                read_chan_type == ChannelType.DIGITAL_OUTPUT):
+        elif read_chan_type in [
+            ChannelType.DIGITAL_INPUT,
+            ChannelType.DIGITAL_OUTPUT,
+        ]:
             if self.in_stream.di_num_booleans_per_chan == 1:
                 data = numpy.zeros(array_shape, dtype=bool)
                 samples_read = _read_digital_lines(
@@ -675,7 +677,6 @@ class Task(object):
                 samples_read = _read_digital_u_32(
                     self._handle, data, number_of_samples_per_channel, timeout)
 
-        # Counter Input
         elif read_chan_type == ChannelType.COUNTER_INPUT:
             meas_type = channels_to_read.ci_meas_type
 
@@ -687,9 +688,10 @@ class Task(object):
                     self._handle, frequencies, duty_cycles,
                     number_of_samples_per_channel, timeout)
 
-                data = []
-                for f, d in zip(frequencies, duty_cycles):
-                    data.append(CtrFreq(freq=f, duty_cycle=d))
+                data = [
+                    CtrFreq(freq=f, duty_cycle=d)
+                    for f, d in zip(frequencies, duty_cycles)
+                ]
 
             elif meas_type == UsageTypeCI.PULSE_TIME:
                 high_times = numpy.zeros(array_shape, dtype=numpy.float64)
@@ -698,9 +700,10 @@ class Task(object):
                 samples_read = _read_ctr_time(
                     self._handle, high_times, low_times,
                     number_of_samples_per_channel, timeout)
-                data = []
-                for h, l in zip(high_times, low_times):
-                    data.append(CtrTime(high_time=h, low_time=l))
+                data = [
+                    CtrTime(high_time=h, low_time=l)
+                    for h, l in zip(high_times, low_times)
+                ]
 
             elif meas_type == UsageTypeCI.PULSE_TICKS:
                 high_ticks = numpy.zeros(array_shape, dtype=numpy.uint32)
@@ -709,9 +712,10 @@ class Task(object):
                 samples_read = _read_ctr_ticks(
                     self._handle, high_ticks, low_ticks,
                     number_of_samples_per_channel, timeout)
-                data = []
-                for h, l in zip(high_ticks, low_ticks):
-                    data.append(CtrTick(high_tick=h, low_tick=l))
+                data = [
+                    CtrTick(high_tick=h, low_tick=l)
+                    for h, l in zip(high_ticks, low_ticks)
+                ]
 
             elif meas_type == UsageTypeCI.COUNT_EDGES:
                 data = numpy.zeros(array_shape, dtype=numpy.uint32)
@@ -731,19 +735,21 @@ class Task(object):
                 DAQmxErrors.READ_NO_INPUT_CHANS_IN_TASK,
                 task_name=self.name)
 
-        if (read_chan_type == ChannelType.COUNTER_INPUT and
-                (meas_type == UsageTypeCI.PULSE_FREQ or
-                 meas_type == UsageTypeCI.PULSE_TICKS or
-                 meas_type == UsageTypeCI.PULSE_TIME)):
-
+        if read_chan_type == ChannelType.COUNTER_INPUT and meas_type in [
+            UsageTypeCI.PULSE_FREQ,
+            UsageTypeCI.PULSE_TICKS,
+            UsageTypeCI.PULSE_TIME,
+        ]:
             if num_samples_not_set and array_shape == 1:
                 return data[0]
 
-            # Counter pulse measurements should not have N channel versions.
-            if samples_read != number_of_samples_per_channel:
-                return data[:samples_read]
-
-            return data
+            else:
+                        # Counter pulse measurements should not have N channel versions.
+                return (
+                    data[:samples_read]
+                    if samples_read != number_of_samples_per_channel
+                    else data
+                )
 
         if num_samples_not_set and array_shape == 1:
             return data.tolist()[0]

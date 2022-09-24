@@ -64,7 +64,7 @@ class TestCounterReaderWriter(TestDAQmxIOBase):
         counters = random.sample(self._get_device_counters(real_x_series_device), 3)
 
         with nidaqmx.Task() as write_task, nidaqmx.Task() as read_task, \
-                nidaqmx.Task() as sample_clk_task:
+                    nidaqmx.Task() as sample_clk_task:
             # Create a finite pulse train task that acts as the sample clock
             # for the read task and the arm start trigger for the write task.
             sample_clk_task.co_channels.add_co_pulse_chan_freq(

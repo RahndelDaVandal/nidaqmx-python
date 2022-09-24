@@ -28,7 +28,7 @@ class ChannelCollection(Sequence):
         elif isinstance(item, Channel):
             items = item.channel_names
 
-        return all([item in channel_names for item in items])
+        return all(item in channel_names for item in items)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
