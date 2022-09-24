@@ -24,7 +24,7 @@ class DAQmxReaderActor(pykka.ThreadingActor):
         self.task = task
 
     def read(self, samples_per_read, number_of_reads, timeout=10):
-        for i in range(number_of_reads):
+        for _ in range(number_of_reads):
             self.task.read(
                 number_of_samples_per_channel=samples_per_read,
                 timeout=timeout)
@@ -46,14 +46,15 @@ class TestMultiThreadedReads(object):
         random.seed(seed)
 
         sample_rate = 10000
-        samples_per_read = int(sample_rate / 10)
+        samples_per_read = sample_rate // 10
 
         number_of_reads = random.randint(200, 500)
         number_of_samples = samples_per_read * number_of_reads
 
-        channels_to_test = []
-        for device in multi_threading_test_devices:
-            channels_to_test.append(random.choice(device.ai_physical_chans))
+        channels_to_test = [
+            random.choice(device.ai_physical_chans)
+            for device in multi_threading_test_devices
+        ]
 
         tasks = []
         try:
@@ -87,10 +88,10 @@ class TestMultiThreadedReads(object):
             for task in tasks:
                 task.start()
 
-            read_futures = []
-            for actor_proxy in actor_proxies:
-                read_futures.append(actor_proxy.read(
-                    samples_per_read, number_of_reads, timeout=2))
+            read_futures = [
+                actor_proxy.read(samples_per_read, number_of_reads, timeout=2)
+                for actor_proxy in actor_proxies
+            ]
 
             pykka.get_all(read_futures, (number_of_samples / sample_rate) + 10)
 

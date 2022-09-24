@@ -21,15 +21,13 @@ class DeviceCollection(Sequence):
 
         if isinstance(item, six.string_types):
             items = unflatten_channel_string(item)
-            return all([i in device_names for i in items])
+            return all(i in device_names for i in items)
         elif isinstance(item, Device):
             return item.name in device_names
         return False
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return True
-        return False
+        return isinstance(other, self.__class__)
 
     def __getitem__(self, index):
         """

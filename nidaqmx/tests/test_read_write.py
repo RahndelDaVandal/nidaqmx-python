@@ -344,8 +344,7 @@ class TestDigitalReadWrite(TestDAQmxIOBase):
                 do_port.name, line_grouping=LineGrouping.CHAN_FOR_ALL_LINES)
 
             # Generate random values to test.
-            values_to_test = [int(random.getrandbits(do_port.do_port_width))
-                              for _ in range(10)]
+            values_to_test = [random.getrandbits(do_port.do_port_width) for _ in range(10)]
 
             values_read = []
             for value_to_test in values_to_test:
@@ -372,7 +371,7 @@ class TestDigitalReadWrite(TestDAQmxIOBase):
         do_ports = random.sample(
             [d for d in real_x_series_device.do_ports if d.do_port_width <= 16], 2)
 
-        total_port_width = sum([d.do_port_width for d in do_ports])
+        total_port_width = sum(d.do_port_width for d in do_ports)
 
         with nidaqmx.Task() as task:
             task.do_channels.add_do_chan(
@@ -380,8 +379,7 @@ class TestDigitalReadWrite(TestDAQmxIOBase):
                 line_grouping=LineGrouping.CHAN_FOR_ALL_LINES)
 
             # Generate random values to test.
-            values_to_test = [int(random.getrandbits(total_port_width))
-                              for _ in range(10)]
+            values_to_test = [random.getrandbits(total_port_width) for _ in range(10)]
 
             values_read = []
             for value_to_test in values_to_test:
@@ -449,7 +447,7 @@ class TestCounterReadWrite(TestDAQmxIOBase):
         counters = random.sample(self._get_device_counters(real_x_series_device), 3)
 
         with nidaqmx.Task() as write_task, nidaqmx.Task() as read_task, \
-                nidaqmx.Task() as sample_clk_task:
+                    nidaqmx.Task() as sample_clk_task:
             # Create a finite pulse train task that acts as the sample clock
             # for the read task and the arm start trigger for the write task.
             sample_clk_task.co_channels.add_co_pulse_chan_freq(

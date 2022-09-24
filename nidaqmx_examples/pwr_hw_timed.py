@@ -22,7 +22,7 @@ with nidaqmx.Task() as task:
         "TS1Mod1/power", voltage_setpoint, current_setpoint, output_enable)
     chan.pwr_idle_output_behavior = idle_output_behavior
     chan.pwr_remote_sense = remote_sense
-    
+
     task.timing.cfg_samp_clk_timing(
         sample_rate, sample_mode=AcquisitionType.CONTINUOUS)
 
@@ -38,7 +38,7 @@ with nidaqmx.Task() as task:
 
             data = task.read(number_of_samples_per_channel=number_of_samples_per_channel)
 
-            print(f'Data:')
+            print('Data:')
             pp.pprint(data)
 
             print(f"output state: {chan.pwr_output_state}")

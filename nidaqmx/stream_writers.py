@@ -105,22 +105,17 @@ class ChannelWriterBase(object):
         if not self._verify_array_shape:
             return
 
-        channels_to_write = self._task.channels
-        number_of_channels = len(channels_to_write.channel_names)
-
         expected_num_dimensions = None
         if is_many_chan:
-            if is_many_samp:
-                expected_num_dimensions = 2
-            else:
-                expected_num_dimensions = 1
+            expected_num_dimensions = 2 if is_many_samp else 1
+            channels_to_write = self._task.channels
+            number_of_channels = len(channels_to_write.channel_names)
 
             if data.shape[0] != number_of_channels:
                 self._task._raise_invalid_write_num_chans_error(
                     number_of_channels, data.shape[0])
-        else:
-            if is_many_samp:
-                expected_num_dimensions = 1
+        elif is_many_samp:
+            expected_num_dimensions = 1
 
         if expected_num_dimensions is not None:
             self._raise_error_if_invalid_write_dimensions(
@@ -144,12 +139,12 @@ class ChannelWriterBase(object):
         if not self._verify_array_shape:
             return
 
-        channels_to_write = self._task.channels
-        number_of_channels = len(channels_to_write.channel_names)
         number_of_lines = self._out_stream.do_num_booleans_per_chan
 
         expected_num_dimensions = None
         if is_many_chan:
+            channels_to_write = self._task.channels
+            number_of_channels = len(channels_to_write.channel_names)
             if data.shape[0] != number_of_channels:
                 self._task._raise_invalid_write_num_chans_error(
                     number_of_channels, data.shape[0])
@@ -161,12 +156,11 @@ class ChannelWriterBase(object):
                         number_of_lines, data.shape[1])
             else:
                 expected_num_dimensions = 1
-        else:
-            if is_many_line:
-                expected_num_dimensions = 1
-                if data.shape[0] != number_of_lines:
-                    self._task._raise_invalid_num_lines_error(
-                        number_of_lines, data.shape[0])
+        elif is_many_line:
+            expected_num_dimensions = 1
+            if data.shape[0] != number_of_lines:
+                self._task._raise_invalid_num_lines_error(
+                    number_of_lines, data.shape[0])
 
         if expected_num_dimensions is not None:
             self._raise_error_if_invalid_write_dimensions(

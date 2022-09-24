@@ -122,7 +122,7 @@ class TestPropertyBasicDataTypes(object):
 
             # Test property deleter.
             del ai_channel.description
-            assert ai_channel.description == ''
+            assert not ai_channel.description
 
     @pytest.mark.parametrize('seed', [generate_random_seed()])
     def test_uint_property(self, any_x_series_device, seed):
@@ -196,4 +196,4 @@ class TestPropertyListDataTypes(object):
             # Test property deleter.
             del ai_channel.ai_bridge_poly_forward_coeff
             assert isinstance(ai_channel.ai_bridge_poly_forward_coeff, list)
-            assert len(ai_channel.ai_bridge_poly_forward_coeff) == 0
+            assert not ai_channel.ai_bridge_poly_forward_coeff

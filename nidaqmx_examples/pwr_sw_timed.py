@@ -32,7 +32,7 @@ with nidaqmx.Task() as task:
 
             data = task.read()
 
-            print(f'Data:')
+            print('Data:')
             pp.pprint(data)
 
             print(f"output state: {chan.pwr_output_state}")

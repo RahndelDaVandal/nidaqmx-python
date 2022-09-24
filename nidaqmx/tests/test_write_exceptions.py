@@ -26,7 +26,7 @@ class TestWriteExceptions(object):
 
     def test_overwrite(self, real_x_series_device):
         # USB streaming is very tricky.
-        if not (real_x_series_device.bus_type == BusType.PCIE or real_x_series_device.bus_type == BusType.PXIE):
+        if real_x_series_device.bus_type not in [BusType.PCIE, BusType.PXIE]:
             pytest.skip("Requires a plugin device.")
 
         number_of_samples = 100
@@ -70,7 +70,7 @@ class TestWriteExceptions(object):
 
     def test_overwrite_during_prime(self, real_x_series_device):
         # USB streaming is very tricky.
-        if not (real_x_series_device.bus_type == BusType.PCIE or real_x_series_device.bus_type == BusType.PXIE):
+        if real_x_series_device.bus_type not in [BusType.PCIE, BusType.PXIE]:
             pytest.skip("Requires a plugin device.")
 
         number_of_samples = 100

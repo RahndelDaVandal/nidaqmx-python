@@ -24,7 +24,7 @@ class PhysicalChannelCollection(Sequence):
 
         if isinstance(item, six.string_types):
             items = unflatten_channel_string(item)
-            return all([i in channel_names for i in items])
+            return all(i in channel_names for i in items)
         elif isinstance(item, PhysicalChannel):
             return item._name in channel_names
         return False
@@ -57,9 +57,7 @@ class PhysicalChannelCollection(Sequence):
             
             Indicates the subset of physical channels indexed.
         """
-        if isinstance(index, six.integer_types):
-            return PhysicalChannel(self.channel_names[index])
-        elif isinstance(index, slice):
+        if isinstance(index, (six.integer_types, slice)):
             return PhysicalChannel(self.channel_names[index])
         elif isinstance(index, six.string_types):
             return PhysicalChannel('{0}/{1}'.format(self._name, index))

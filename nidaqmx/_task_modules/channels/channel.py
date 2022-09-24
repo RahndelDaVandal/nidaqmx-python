@@ -51,7 +51,7 @@ class Channel(object):
         elif isinstance(item, Channel):
             items = item.channel_names
 
-        return all([item in channel_names for item in items])
+        return all(item in channel_names for item in items)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -141,10 +141,7 @@ class Channel(object):
         str: Specifies the name of the virtual channel this object
             represents.
         """
-        if self._name:
-            return self._name
-        else:
-            return self._all_channels_name
+        return self._name or self._all_channels_name
 
     @property
     def channel_names(self):

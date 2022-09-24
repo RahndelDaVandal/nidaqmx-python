@@ -43,22 +43,11 @@ def flatten_channel_string(channel_names):
         'end_index': -1
         }
     for channel_name in unflattened_channel_names:
-        m = re.search('(.*[^0-9])?([0-9]+)$', channel_name)
-        if not m:
-            # If the channel name doesn't end in a valid number, just use the
-            # channel name as-is.
-            flattened_channel_list.append(
-                _channel_info_to_flattened_name(previous))
-            previous = {
-                'base_name': channel_name,
-                'start_index': -1,
-                'end_index': -1
-                }
-        else:
+        if m := re.search('(.*[^0-9])?([0-9]+)$', channel_name):
             # If the channel name ends in a valid number, we may need to flatten
             # this channel with subsequent channels in the x:y format.
-            current_base_name = m.group(1)
-            current_index = int(m.group(2))
+            current_base_name = m[1]
+            current_index = int(m[2])
 
             if current_base_name == previous['base_name'] and (
                 (current_index == previous['end_index'] + 1 and
@@ -81,6 +70,16 @@ def flatten_channel_string(channel_names):
                     'end_index': current_index
                     }
 
+        else:
+            # If the channel name doesn't end in a valid number, just use the
+            # channel name as-is.
+            flattened_channel_list.append(
+                _channel_info_to_flattened_name(previous))
+            previous = {
+                'base_name': channel_name,
+                'start_index': -1,
+                'end_index': -1
+                }
     # Convert the final channel dictionary to a flattened string
     flattened_channel_list.append(
         _channel_info_to_flattened_name(previous))
@@ -142,13 +141,12 @@ def unflatten_channel_string(channel_names):
                 raise DaqError(_invalid_range_syntax_message,
                                        error_code=-200498)
 
-            if m_after.group(1) and (
-                m_before.group(1).lower() != m_after.group(1).lower()):
+            if m_after[1] and m_before[1].lower() != m_after[1].lower():
                 raise DaqError(_invalid_range_syntax_message,
                                error_code=-200498)
 
-            num_before = int(m_before.group(2))
-            num_after = int(m_after.group(2))
+            num_before = int(m_before[2])
+            num_after = int(m_after[2])
             num_max = max([num_before, num_after])
             num_min = min([num_before, num_after])
             number_of_channels = (num_max - num_min) + 1
@@ -157,10 +155,10 @@ def unflatten_channel_string(channel_names):
                 raise DaqError(_invalid_range_syntax_message,
                                        error_code=-200498)
 
-            colon_expanded_channel = []
-            for i in range(number_of_channels):
-                colon_expanded_channel.append(
-                    '{0}{1}'.format(m_before.group(1), num_min + i))
+            colon_expanded_channel = [
+                '{0}{1}'.format(m_before[1], num_min + i)
+                for i in range(number_of_channels)
+            ]
 
             if num_after < num_before:
                 colon_expanded_channel.reverse()

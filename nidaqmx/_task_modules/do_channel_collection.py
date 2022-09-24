@@ -38,22 +38,21 @@ class DOChannelCollection(ChannelCollection):
         """
         unflattened_lines = unflatten_channel_string(lines)
         num_lines = len(unflattened_lines)
-        
-        if line_grouping == LineGrouping.CHAN_FOR_ALL_LINES:
-            if name_to_assign_to_lines or num_lines == 1:
-                name = lines
-            else:
-                name = unflattened_lines[0] + '...'
-        else:
-            if name_to_assign_to_lines:
-                if num_lines > 1:
-                    name = '{0}0:{1}'.format(
-                        name_to_assign_to_lines, num_lines-1)
-                else:
-                    name = name_to_assign_to_lines
-            else:
-                name = lines
 
+        if (
+            line_grouping == LineGrouping.CHAN_FOR_ALL_LINES
+            and (name_to_assign_to_lines or num_lines == 1)
+            or line_grouping != LineGrouping.CHAN_FOR_ALL_LINES
+            and not name_to_assign_to_lines
+        ):
+            name = lines
+        elif line_grouping == LineGrouping.CHAN_FOR_ALL_LINES:
+            name = f'{unflattened_lines[0]}...'
+        elif num_lines > 1:
+            name = '{0}0:{1}'.format(
+                name_to_assign_to_lines, num_lines-1)
+        else:
+            name = name_to_assign_to_lines
         return DOChannel(self._handle, name)
 
     def add_do_chan(

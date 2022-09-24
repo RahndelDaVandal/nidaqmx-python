@@ -58,17 +58,14 @@ def wrapped_ndpointer(*args, **kwargs):
 
     Taken from http://stackoverflow.com/questions/32120178
     """
-    if sys.version_info < (3,):
-        if 'flags' in kwargs:
-            kwargs['flags'] = tuple(
-                f.encode('ascii') for f in kwargs['flags'])
+    if sys.version_info < (3,) and 'flags' in kwargs:
+        kwargs['flags'] = tuple(
+            f.encode('ascii') for f in kwargs['flags'])
 
     base = ndpointer(*args, **kwargs)
 
     def from_param(cls, obj):
-        if obj is None:
-            return obj
-        return base.from_param(obj)
+        return obj if obj is None else base.from_param(obj)
 
     return type(base.__name__, (base,),
                 {'from_param': classmethod(from_param)})
@@ -205,15 +202,13 @@ class DaqLibImporter(object):
                 cdll = ctypes.cdll.LoadLibrary(lib_name)
 
         elif sys.platform.startswith('linux'):
-            # On linux you can use the command find_library('nidaqmx')
-            if find_library('nidaqmx') is not None:
-                cdll = ctypes.cdll.LoadLibrary(find_library('nidaqmx'))
-                windll = cdll
-            else:
+            if find_library('nidaqmx') is None:
                 raise DaqNotFoundError(
                     'Could not find an installation of NI-DAQmx. Please '
                     'ensure that NI-DAQmx is installed on this machine or '
                     'contact National Instruments for support.')
+            cdll = ctypes.cdll.LoadLibrary(find_library('nidaqmx'))
+            windll = cdll
         else:
             raise DaqNotFoundError(
                 'NI-DAQmx Python is not supported on this platform: {0}. '
